@@ -14,7 +14,7 @@ type repository struct {
 }
 
 func NewRepository(connectionString string) *repository {
-	r := repository{}
+	r := repository{connectionString}
 	return &r
 }
 
@@ -86,7 +86,7 @@ func (r *repository) SetItem(s string) (string, error) {
 }
 
 func (r *repository) getCollection() (*mongo.Collection, error) {
-	client, err := mongo.NewClient("mongodb://127.0.0.1:27017")
+	client, err := mongo.NewClient("mongodb://" + r.connectionString)
 	if err != nil {
 		return nil, err
 	}
@@ -97,6 +97,10 @@ func (r *repository) getCollection() (*mongo.Collection, error) {
 	}
 
 	collection := client.Database("TestDb").Collection("testcollection")
+
+	if collection == nil {
+		return nil, errors.New("Failed connecting to collection")
+	}
 
 	return collection, nil
 }
